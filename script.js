@@ -300,8 +300,8 @@ function showMainContent() {
     document.getElementById('mainContent').style.display = 'block';
     // 更新頁面語言
     updatePageLanguage();
-    // 載入資料
-    loadDataFromAPI();
+    // 載入資料（標記為初次載入，啟用更強的重試機制）
+    loadDataFromAPI(0, true);
 }
 
 // 處理登入
@@ -321,7 +321,7 @@ function handleLogin(event) {
 
         setTimeout(() => {
             showMainContent();
-            loadDataFromAPI(); // 載入資料
+            loadDataFromAPI(0, true); // 載入資料（初次載入）
         }, 300);
     } else {
         // 驗證失敗
@@ -412,12 +412,20 @@ function formatDate(dateString) {
 
 // ===== API 操作 =====
 
-async function loadDataFromAPI(retryCount = 0) {
+async function loadDataFromAPI(retryCount = 0, isInitialLoad = false) {
     try {
         showToast(t('loadingData'), 2000);
-        console.log('📖 正在從 API 讀取資料...');
+        console.log(`📖 正在從 API 讀取資料... (嘗試 ${retryCount + 1}/${isInitialLoad ? 4 : 2})`);
 
-        const response = await fetch(`${API_BASE_URL}/api/items`);
+        // 為手機網路設定較長的超時時間
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10秒超時
+
+        const response = await fetch(`${API_BASE_URL}/api/items`, {
+            signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+
         const result = await response.json();
 
         console.log('📊 API 回應:', result);
@@ -434,11 +442,24 @@ async function loadDataFromAPI(retryCount = 0) {
         }
     } catch (error) {
         console.error('❌ 讀取錯誤:', error);
-        showNotification(t('notifyLoadError') + ': ' + error.message);
 
-        if (retryCount < 1) {
-            console.log('⏳ 3 秒後自動重試...');
-            setTimeout(() => loadDataFromAPI(retryCount + 1), 3000);
+        // 判斷是否為網路超時
+        const isTimeout = error.name === 'AbortError';
+        const errorMsg = isTimeout ? '網路連線逾時' : error.message;
+
+        showNotification(t('notifyLoadError') + ': ' + errorMsg);
+
+        // 初次載入時重試3次，手動重新整理時重試1次
+        const maxRetries = isInitialLoad ? 3 : 1;
+
+        if (retryCount < maxRetries) {
+            // 使用指數退避：3秒、6秒、9秒
+            const delay = (retryCount + 1) * 3000;
+            console.log(`⏳ ${delay / 1000} 秒後自動重試...`);
+            setTimeout(() => loadDataFromAPI(retryCount + 1, isInitialLoad), delay);
+        } else if (isInitialLoad) {
+            // 所有重試都失敗後，顯示提示訊息
+            showToast('⚠️ 自動載入失敗，請點擊「重新整理」按鈕', 5000);
         }
     }
 }
