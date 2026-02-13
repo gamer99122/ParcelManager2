@@ -69,8 +69,13 @@
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 .lightbox-close {
@@ -134,8 +139,13 @@
     background: rgba(255, 255, 255, 0.5);
 }
 
-.lightbox-nav.prev { left: 20px; }
-.lightbox-nav.next { right: 20px; }
+.lightbox-nav.prev {
+    left: 20px;
+}
+
+.lightbox-nav.next {
+    right: 20px;
+}
 
 .lightbox-counter {
     position: absolute;
@@ -154,6 +164,7 @@
         transform: translateX(400px);
         opacity: 0;
     }
+
     to {
         transform: translateX(0);
         opacity: 1;
@@ -165,6 +176,7 @@
         transform: translateX(0);
         opacity: 1;
     }
+
     to {
         transform: translateX(400px);
         opacity: 0;
@@ -182,13 +194,42 @@
     word-wrap: break-word;
 }
 
-.col-date { width: 12%; min-width: 100px; }
-.col-sequence { width: 8%; min-width: 60px; }
-.col-image { width: 18%; min-width: 150px; }
-.col-brand { width: 12%; min-width: 100px; }
-.col-shipment { width: 12%; min-width: 120px; }
-.col-notes { width: 25%; min-width: 150px; max-height: 200px; overflow-y: auto; }
-.col-actions { width: 13%; min-width: 110px; }
+.col-date {
+    width: 12%;
+    min-width: 100px;
+}
+
+.col-sequence {
+    width: 8%;
+    min-width: 60px;
+}
+
+.col-image {
+    width: 18%;
+    min-width: 150px;
+}
+
+.col-brand {
+    width: 12%;
+    min-width: 100px;
+}
+
+.col-shipment {
+    width: 12%;
+    min-width: 120px;
+}
+
+.col-notes {
+    width: 25%;
+    min-width: 150px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.col-actions {
+    width: 13%;
+    min-width: 110px;
+}
 
 /* 操作按鈕 */
 .actions {
@@ -198,15 +239,19 @@
 
 /* 響應式設計 */
 @media (max-width: 768px) {
+
     /* 表格容器啟用水平滑動 */
     .table-responsive {
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch; /* iOS 平滑滑動 */
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        /* iOS 平滑滑動 */
+        display: block !important;
     }
 
     /* 表格最小寬度，確保不會擠在一起 */
     .shopping-table {
-        min-width: 800px; /* 設定最小寬度，超過螢幕寬度時可以滑動 */
+        min-width: 800px !important;
+        /* 設定最小寬度，超過螢幕寬度時可以滑動 */
     }
 
     /* 調整圖片大小 */
@@ -227,10 +272,24 @@
     }
 
     /* 燈箱控制 */
-    .lightbox-nav { font-size: 2em; padding: 8px 15px; }
-    .lightbox-nav.prev { left: 10px; }
-    .lightbox-nav.next { right: 10px; }
-    .lightbox-close { font-size: 2em; top: 10px; right: 15px; }
+    .lightbox-nav {
+        font-size: 2em;
+        padding: 8px 15px;
+    }
+
+    .lightbox-nav.prev {
+        left: 10px;
+    }
+
+    .lightbox-nav.next {
+        right: 10px;
+    }
+
+    .lightbox-close {
+        font-size: 2em;
+        top: 10px;
+        right: 15px;
+    }
 
     /* 調整表格內距 */
     .shopping-table th,
