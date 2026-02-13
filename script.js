@@ -39,7 +39,7 @@ const translations = {
         editShipment: '寄送狀態',
 
         // 寄送狀態選項
-        shipmentBlank: '空白',
+        shipmentBlank: '',
         shipmentNo: '不寄送',
         shipmentYes: '寄送',
         shipmentPartial: '部分寄送',
@@ -102,7 +102,7 @@ const translations = {
         editShipment: '配送状況',
 
         // 配送状況オプション
-        shipmentBlank: '空白',
+        shipmentBlank: '',
         shipmentNo: '配送なし',
         shipmentYes: '配送',
         shipmentPartial: '一部配送',
@@ -132,8 +132,13 @@ const translations = {
 let currentLang = localStorage.getItem('language') || 'zh-TW';
 
 // 取得翻譯文字
+// 取得翻譯文字
 function t(key) {
-    return translations[currentLang][key] || translations['zh-TW'][key] || key;
+    const val = translations[currentLang][key];
+    if (val !== undefined) return val;
+    const valTW = translations['zh-TW'][key];
+    if (valTW !== undefined) return valTW;
+    return key;
 }
 
 // 切換語言
@@ -227,6 +232,25 @@ function updateFormLabels() {
         labels[3].textContent = t('editBrand');
         labels[4].textContent = t('editNotes');
         labels[5].textContent = t('editShipment');
+    }
+
+    // 更新寄送狀態下拉選單選項
+    const shipmentSelect = document.getElementById('editShipment');
+    if (shipmentSelect) {
+        // 保存當前選中的值
+        const currentValue = shipmentSelect.value;
+
+        shipmentSelect.innerHTML = `
+            <option value="空白">${t('shipmentBlank')}</option>
+            <option value="不寄送">${t('shipmentNo')}</option>
+            <option value="寄送">${t('shipmentYes')}</option>
+            <option value="部分寄送">${t('shipmentPartial')}</option>
+        `;
+
+        // 恢復選中的值 (如果值存在)
+        if (currentValue) {
+            shipmentSelect.value = currentValue;
+        }
     }
 }
 
@@ -536,10 +560,10 @@ function renderTable() {
                 <td class="px-4 py-3" data-label="${t('tableBrand')}">${item.brand || '-'}</td>
                 <td class="px-4 py-3" data-label="${t('tableShipment')}">
                     <select class="form-select form-select-sm" onchange="updateShipment('${item.id}', this.value)">
-                        <option value="空白" ${item.shipment === '空白' ? 'selected' : ''}>空白</option>
-                        <option value="不寄送" ${item.shipment === '不寄送' ? 'selected' : ''}>不寄送</option>
-                        <option value="寄送" ${item.shipment === '寄送' ? 'selected' : ''}>寄送</option>
-                        <option value="部分寄送" ${item.shipment === '部分寄送' ? 'selected' : ''}>部分寄送</option>
+                        <option value="空白" ${item.shipment === '空白' ? 'selected' : ''}>${t('shipmentBlank')}</option>
+                        <option value="不寄送" ${item.shipment === '不寄送' ? 'selected' : ''}>${t('shipmentNo')}</option>
+                        <option value="寄送" ${item.shipment === '寄送' ? 'selected' : ''}>${t('shipmentYes')}</option>
+                        <option value="部分寄送" ${item.shipment === '部分寄送' ? 'selected' : ''}>${t('shipmentPartial')}</option>
                     </select>
                 </td>
                 <td class="px-4 py-3" data-label="${t('tableNotes')}">
