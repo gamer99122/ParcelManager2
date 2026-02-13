@@ -135,7 +135,17 @@ const translations = {
 };
 
 // 當前語言
-let currentLang = localStorage.getItem('language') || 'zh-TW';
+let currentLang = localStorage.getItem('language');
+
+if (!currentLang) {
+    // 如果沒有儲存的語言設定，則偵測瀏覽器語言
+    const browserLang = navigator.language || navigator.userLanguage;
+    if (browserLang && browserLang.toLowerCase().startsWith('zh')) {
+        currentLang = 'zh-TW';
+    } else {
+        currentLang = 'ja'; // 預設為日文
+    }
+}
 
 // 取得翻譯文字
 // 取得翻譯文字
