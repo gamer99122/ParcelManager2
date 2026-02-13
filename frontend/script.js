@@ -8,6 +8,7 @@ let currentEditId = null;
 let currentLightboxItemId = null;
 let currentImageIndex = 0;
 let isSaving = false; // 防止重複提交
+let allowDelete = false; // 是否允許刪除（基於 ?add=1 參數）
 
 // ===== 工具函數 =====
 
@@ -148,6 +149,13 @@ async function saveEdit(event) {
 }
 
 async function deleteItem(id) {
+    // 檢查是否允許刪除
+    if (!allowDelete) {
+        showNotification('❌ 刪除功能已禁用');
+        console.warn('❌ 刪除被拒絕: allowDelete 為 false');
+        return;
+    }
+
     if (!confirm('確定刪除？')) return;
 
     showLoading(true);
@@ -212,7 +220,7 @@ function renderTable() {
                 <td class="px-4 py-3">
                     <div class="actions">
                         <button class="btn btn-sm btn-primary" onclick="editItem('${item.id}')">編輯</button>
-                        <button class="btn btn-sm btn-danger" onclick="deleteItem('${item.id}')">刪除</button>
+                        ${allowDelete ? `<button class="btn btn-sm btn-danger" onclick="deleteItem('${item.id}')">刪除</button>` : ''}
                     </div>
                 </td>
             </tr>
@@ -331,9 +339,14 @@ function nextImage() {
 document.addEventListener('DOMContentLoaded', () => {
     // 檢查 URL 參數 add=1
     const params = new URLSearchParams(window.location.search);
-    const addBtn = document.getElementById('addBtn');
-    if (params.get('add') === '1' && addBtn) {
-        addBtn.style.display = 'block';
+
+    // 檢查是否啟用新增和刪除功能
+    if (params.get('add') === '1') {
+        allowDelete = true;
+        const addBtn = document.getElementById('addBtn');
+        if (addBtn) {
+            addBtn.style.display = 'block';
+        }
     }
 
     // 檢查 API URL 參數
