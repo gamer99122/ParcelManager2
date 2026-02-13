@@ -10,137 +10,170 @@
 </head>
 
 <body class="bg-light">
-    <div class="container-fluid py-5">
-        <div class="container">
-            <!-- 頁面標題 -->
-            <div class="text-white rounded-3 p-5 mb-5 shadow-lg"
-                style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                <div class="d-flex justify-content-between align-items-start mb-3">
-                    <div>
-                        <h1 class="display-4 mb-2">📦 包裹清單管理</h1>
-                        <p class="lead mb-0">追蹤和管理您的包裹</p>
+    <!-- 驗證碼登入頁面 -->
+    <div id="loginPage" class="login-page">
+        <div class="login-container">
+            <div class="login-box">
+                <div class="login-icon">🔐</div>
+                <h2 class="login-title">包裹管理系統</h2>
+                <p class="login-subtitle">請輸入驗證碼以繼續</p>
+                <form id="loginForm" onsubmit="handleLogin(event)">
+                    <input type="password" id="loginCode" class="login-input" placeholder="請輸入驗證碼" autocomplete="off"
+                        required>
+                    <button type="submit" class="login-button">登入</button>
+                    <div id="loginError" class="login-error"></div>
+                </form>
+                <!-- 語言選擇器 -->
+                <div class="language-selector">
+                    <button class="lang-btn active" data-lang="zh-TW" onclick="switchLanguage('zh-TW')">繁中</button>
+                    <button class="lang-btn" data-lang="ja" onclick="switchLanguage('ja')">日本語</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主要內容區域 -->
+    <div id="mainContent" style="display: none;">
+        <div class="container-fluid py-5">
+            <div class="container">
+                <!-- 頁面標題 -->
+                <div class="text-white rounded-3 p-5 mb-5 shadow-lg"
+                    style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <h1 class="display-4 mb-2">📦 包裹清單管理</h1>
+                            <p class="lead mb-0">追蹤和管理您的包裹</p>
+                        </div>
+                        <!-- 語言選擇器 -->
+                        <div class="language-selector-main">
+                            <button class="lang-btn active" data-lang="zh-TW"
+                                onclick="switchLanguage('zh-TW')">繁中</button>
+                            <button class="lang-btn" data-lang="ja" onclick="switchLanguage('ja')">日本語</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 控制按鈕 -->
+                <div class="mb-4">
+                    <button id="addBtn" class="btn btn-primary btn-lg" onclick="toggleAddForm()" style="display: none;">
+                        新增項目
+                    </button>
+                    <button class="btn btn-success btn-lg" onclick="loadDataFromAPI()">
+                        🔄 重新整理
+                    </button>
+                </div>
+
+                <!-- 加載動畫 -->
+                <div id="loadingOverlay"
+                    class="d-none position-fixed start-0 top-0 w-100 h-100 bg-dark bg-opacity-50 d-flex align-items-center justify-content-center"
+                    style="z-index: 9999;">
+                    <div class="spinner-border text-light" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+
+                <!-- 表格 -->
+                <div class="table-responsive rounded-3 shadow-sm overflow-hidden bg-white">
+                    <table class="table table-hover mb-0 shopping-table">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="col-date px-4 py-3">收件日期</th>
+                                <th class="col-sequence px-4 py-3">序號</th>
+                                <th class="col-image px-4 py-3">圖片</th>
+                                <th class="col-brand px-4 py-3">商家</th>
+                                <th class="col-shipment px-4 py-3">寄送狀態</th>
+                                <th class="col-notes px-4 py-3">備註</th>
+                                <th class="col-actions px-4 py-3">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                            <tr>
+                                <td colspan="7" class="text-center py-4">載入中...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- 統計 -->
+                <div class="mt-4 text-end">
+                    <p class="text-dark fs-5">
+                        總共 <span class="badge bg-primary fs-6" id="itemCount">0</span> 項商品
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 圖片燈箱 -->
+        <div id="lightbox" class="lightbox">
+            <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
+            <div class="lightbox-container">
+                <button id="prevBtn" class="lightbox-nav prev" onclick="prevImage()">❮</button>
+                <div class="lightbox-image-wrapper">
+                    <img id="lightboxImage" alt="全圖檢視">
+                </div>
+                <button id="nextBtn" class="lightbox-nav next" onclick="nextImage()">❯</button>
+            </div>
+            <div class="lightbox-counter" id="lightboxCounter">1 / 1</div>
+        </div>
+
+        <!-- 編輯模態框 -->
+        <div id="editModal" class="modal fade" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">編輯項目</h5>
+                        <button type="button" class="btn-close" onclick="closeEditModal()" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editForm">
+                            <div class="mb-3">
+                                <label for="editDate" class="form-label fw-bold">收件日期</label>
+                                <input type="date" class="form-control" id="editDate" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editSequence" class="form-label fw-bold">序號</label>
+                                <input type="text" class="form-control" id="editSequence" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">商品圖片 (最多 6 張，圖片網址)</label>
+                                <input type="url" class="form-control mb-2" id="editImage1" placeholder="圖片 1">
+                                <input type="url" class="form-control mb-2" id="editImage2" placeholder="圖片 2">
+                                <input type="url" class="form-control mb-2" id="editImage3" placeholder="圖片 3">
+                                <input type="url" class="form-control mb-2" id="editImage4" placeholder="圖片 4">
+                                <input type="url" class="form-control mb-2" id="editImage5" placeholder="圖片 5">
+                                <input type="url" class="form-control mb-2" id="editImage6" placeholder="圖片 6">
+                            </div>
+                            <div class="mb-3">
+                                <label for="editBrand" class="form-label fw-bold">商家</label>
+                                <input type="text" class="form-control" id="editBrand">
+                            </div>
+                            <div class="mb-3">
+                                <label for="editNotes" class="form-label fw-bold">備註</label>
+                                <textarea class="form-control" id="editNotes" rows="3"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editShipment" class="form-label fw-bold">寄送狀態</label>
+                                <select class="form-select" id="editShipment">
+                                    <option value="空白">空白</option>
+                                    <option value="不寄送">不寄送</option>
+                                    <option value="寄送">寄送</option>
+                                    <option value="部分寄送">部分寄送</option>
+                                </select>
+                            </div>
+                            <div class="d-flex gap-2 justify-content-end">
+                                <button type="button" class="btn btn-secondary" onclick="closeEditModal()">取消</button>
+                                <button type="submit" class="btn btn-primary">儲存</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
-
-            <!-- 控制按鈕 -->
-            <div class="mb-4">
-                <button id="addBtn" class="btn btn-primary btn-lg" onclick="toggleAddForm()" style="display: none;">
-                    新增項目
-                </button>
-                <button class="btn btn-success btn-lg" onclick="loadDataFromAPI()">
-                    🔄 重新整理
-                </button>
-            </div>
-
-            <!-- 加載動畫 -->
-            <div id="loadingOverlay"
-                class="d-none position-fixed start-0 top-0 w-100 h-100 bg-dark bg-opacity-50 d-flex align-items-center justify-content-center"
-                style="z-index: 9999;">
-                <div class="spinner-border text-light" role="status">
-                    <span class="visually-hidden">Loading...</span>
-                </div>
-            </div>
-
-            <!-- 表格 -->
-            <div class="table-responsive rounded-3 shadow-sm overflow-hidden bg-white">
-                <table class="table table-hover mb-0 shopping-table">
-                    <thead class="table-light">
-                        <tr>
-                            <th class="col-date px-4 py-3">收件日期</th>
-                            <th class="col-sequence px-4 py-3">序號</th>
-                            <th class="col-image px-4 py-3">圖片</th>
-                            <th class="col-brand px-4 py-3">商家</th>
-                            <th class="col-shipment px-4 py-3">寄送狀態</th>
-                            <th class="col-notes px-4 py-3">備註</th>
-                            <th class="col-actions px-4 py-3">操作</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tableBody">
-                        <tr>
-                            <td colspan="7" class="text-center py-4">載入中...</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- 統計 -->
-            <div class="mt-4 text-end">
-                <p class="text-dark fs-5">
-                    總共 <span class="badge bg-primary fs-6" id="itemCount">0</span> 項商品
-                </p>
-            </div>
         </div>
     </div>
-
-    <!-- 圖片燈箱 -->
-    <div id="lightbox" class="lightbox">
-        <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
-        <div class="lightbox-container">
-            <button id="prevBtn" class="lightbox-nav prev" onclick="prevImage()">❮</button>
-            <div class="lightbox-image-wrapper">
-                <img id="lightboxImage" alt="全圖檢視">
-            </div>
-            <button id="nextBtn" class="lightbox-nav next" onclick="nextImage()">❯</button>
-        </div>
-        <div class="lightbox-counter" id="lightboxCounter">1 / 1</div>
-    </div>
-
-    <!-- 編輯模態框 -->
-    <div id="editModal" class="modal fade" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">編輯項目</h5>
-                    <button type="button" class="btn-close" onclick="closeEditModal()" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="editForm">
-                        <div class="mb-3">
-                            <label for="editDate" class="form-label fw-bold">收件日期</label>
-                            <input type="date" class="form-control" id="editDate" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="editSequence" class="form-label fw-bold">序號</label>
-                            <input type="text" class="form-control" id="editSequence" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">商品圖片 (最多 6 張，圖片網址)</label>
-                            <input type="url" class="form-control mb-2" id="editImage1" placeholder="圖片 1">
-                            <input type="url" class="form-control mb-2" id="editImage2" placeholder="圖片 2">
-                            <input type="url" class="form-control mb-2" id="editImage3" placeholder="圖片 3">
-                            <input type="url" class="form-control mb-2" id="editImage4" placeholder="圖片 4">
-                            <input type="url" class="form-control mb-2" id="editImage5" placeholder="圖片 5">
-                            <input type="url" class="form-control mb-2" id="editImage6" placeholder="圖片 6">
-                        </div>
-                        <div class="mb-3">
-                            <label for="editBrand" class="form-label fw-bold">商家</label>
-                            <input type="text" class="form-control" id="editBrand">
-                        </div>
-                        <div class="mb-3">
-                            <label for="editNotes" class="form-label fw-bold">備註</label>
-                            <textarea class="form-control" id="editNotes" rows="3"></textarea>
-                        </div>
-                        <div class="mb-3">
-                            <label for="editShipment" class="form-label fw-bold">寄送狀態</label>
-                            <select class="form-select" id="editShipment">
-                                <option value="空白">空白</option>
-                                <option value="不寄送">不寄送</option>
-                                <option value="寄送">寄送</option>
-                                <option value="部分寄送">部分寄送</option>
-                            </select>
-                        </div>
-                        <div class="d-flex gap-2 justify-content-end">
-                            <button type="button" class="btn btn-secondary" onclick="closeEditModal()">取消</button>
-                            <button type="submit" class="btn btn-primary">儲存</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
+    </div> <!-- 關閉 mainContent -->
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    </script>
     <script src="script.js"></script>
 </body>
 
