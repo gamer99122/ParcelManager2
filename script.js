@@ -56,6 +56,8 @@ const translations = {
         // 其他
         deleteConfirm: '確定刪除？',
         loading: '載入中...',
+        loadingData: '正在載入資料...',
+        loadingHint: '如果清單載入不順利，請按下「重新整理」按鈕',
         noImage: '無圖片',
         itemCount: '項商品',
         totalCount: '總共',
@@ -117,6 +119,8 @@ const translations = {
         // その他
         deleteConfirm: '削除してもよろしいですか？',
         loading: '読み込み中...',
+        loadingData: 'データを読み込んでいます...',
+        loadingHint: 'リストの読み込みがうまくいかない場合は、「更新」ボタンを押してください',
         noImage: '画像なし',
         itemCount: '件の商品',
         totalCount: '合計',
@@ -169,7 +173,10 @@ function updatePageLanguage() {
 
     // 更新表格標題
     const headers = document.querySelectorAll('thead th');
-    if (headers.length >= 7) {
+    const params = new URLSearchParams(window.location.search);
+    const canEdit = params.get('edit') === '1';
+
+    if (canEdit && headers.length >= 7) {
         headers[0].textContent = t('tableDate');
         headers[1].textContent = t('tableSequence');
         headers[2].textContent = t('tableImage');
@@ -177,6 +184,13 @@ function updatePageLanguage() {
         headers[4].textContent = t('tableShipment');
         headers[5].textContent = t('tableNotes');
         headers[6].textContent = t('tableActions');
+    } else if (!canEdit && headers.length >= 6) {
+        headers[0].textContent = t('tableDate');
+        headers[1].textContent = t('tableSequence');
+        headers[2].textContent = t('tableImage');
+        headers[3].textContent = t('tableBrand');
+        headers[4].textContent = t('tableShipment');
+        headers[5].textContent = t('tableNotes');
     }
 
     // 更新編輯表單
@@ -185,6 +199,18 @@ function updatePageLanguage() {
 
     // 更新表單標籤
     updateFormLabels();
+
+    // 更新載入提示文字
+    const loadingHint = document.getElementById('loadingHint');
+    if (loadingHint) {
+        loadingHint.innerHTML = `<i class="bi bi-info-circle"></i> ${t('loadingHint')}`;
+    }
+
+    // 隱藏或顯示操作欄標題
+    const actionsHeader = document.getElementById('actionsHeader');
+    if (actionsHeader) {
+        actionsHeader.style.display = canEdit ? '' : 'none';
+    }
 
     // 更新語言選擇器按鈕狀態
     updateLanguageButtons();
@@ -239,6 +265,10 @@ function showLoginPage() {
 function showMainContent() {
     document.getElementById('loginPage').style.display = 'none';
     document.getElementById('mainContent').style.display = 'block';
+    // 更新頁面語言
+    updatePageLanguage();
+    // 載入資料
+    loadDataFromAPI();
 }
 
 // 處理登入
@@ -287,11 +317,30 @@ let currentImageIndex = 0;
 
 // ===== 工具函數 =====
 
+// Toast 通知系統
+function showToast(message, duration = 3000) {
+    const toast = document.getElementById('toast');
+    const toastMessage = document.getElementById('toastMessage');
+    if (toast && toastMessage) {
+        toastMessage.textContent = message;
+        toast.classList.add('show');
+
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, duration);
+    }
+}
+
 function showLoading(show) {
     const overlay = document.getElementById('loadingOverlay');
+    const loadingText = document.getElementById('loadingText');
     if (overlay) {
-        if (show) overlay.classList.remove('d-none');
-        else overlay.classList.add('d-none');
+        if (show) {
+            overlay.classList.remove('d-none');
+            if (loadingText) loadingText.textContent = t('loadingData');
+        } else {
+            overlay.classList.add('d-none');
+        }
     }
 }
 
@@ -332,7 +381,7 @@ function formatDate(dateString) {
 
 async function loadDataFromAPI(retryCount = 0) {
     try {
-        showLoading(true);
+        showToast(t('loadingData'), 2000);
         console.log('📖 正在從 API 讀取資料...');
 
         const response = await fetch(`${API_BASE_URL}/api/items`);
@@ -358,14 +407,12 @@ async function loadDataFromAPI(retryCount = 0) {
             console.log('⏳ 3 秒後自動重試...');
             setTimeout(() => loadDataFromAPI(retryCount + 1), 3000);
         }
-    } finally {
-        showLoading(false);
     }
 }
 
 async function saveEdit(event) {
     event.preventDefault();
-    showLoading(true);
+    showToast(t('notifySaveSuccess'), 1000);
 
     try {
         const itemData = {
@@ -410,15 +457,20 @@ async function saveEdit(event) {
     } catch (error) {
         console.error('❌ 儲存錯誤:', error);
         showNotification('❌ ' + error.message);
-    } finally {
-        showLoading(false);
     }
 }
 
 async function deleteItem(id) {
+    // 檢查是否有編輯權限
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('edit') !== '1') {
+        showToast('❌ 無刪除權限', 2000);
+        return;
+    }
+
     if (!confirm(t('deleteConfirm'))) return;
 
-    showLoading(true);
+    showToast(t('notifyDeleteSuccess'), 1000);
     try {
         const response = await fetch(`${API_BASE_URL}/api/items/${id}`, {
             method: 'DELETE'
@@ -435,8 +487,6 @@ async function deleteItem(id) {
     } catch (error) {
         console.error('❌ 刪除錯誤:', error);
         showNotification('❌ 錯誤: ' + error.message);
-    } finally {
-        showLoading(false);
     }
 }
 
@@ -450,6 +500,10 @@ function renderTable() {
         String(a.date).localeCompare(String(b.date))
     );
 
+    // 檢查是否有 edit=1 參數
+    const params = new URLSearchParams(window.location.search);
+    const canEdit = params.get('edit') === '1';
+
     tableBody.innerHTML = sortedList.map(item => {
         const validImages = (item.images || []).filter(img => img && img.trim());
         const imageHTML = validImages.length > 0 ?
@@ -461,6 +515,16 @@ function renderTable() {
                     </div>`
             ).join('')}
             </div>` : `<div class="image-placeholder">無圖片</div>`;
+
+
+        // 根據參數決定是否顯示編輯和刪除按鈕
+        const editButtonHTML = canEdit
+            ? `<button class="btn btn-sm btn-primary" onclick="editItem('${item.id}')">編輯</button>`
+            : '';
+        const deleteButtonHTML = canEdit
+            ? `<button class="btn btn-sm btn-danger" onclick="deleteItem('${item.id}')">刪除</button>`
+            : '';
+
 
         return `
             <tr>
@@ -476,13 +540,29 @@ function renderTable() {
                         <option value="部分寄送" ${item.shipment === '部分寄送' ? 'selected' : ''}>部分寄送</option>
                     </select>
                 </td>
-                <td class="px-4 py-3" style="white-space: pre-wrap;">${item.notes || '-'}</td>
                 <td class="px-4 py-3">
-                    <div class="actions">
-                        <button class="btn btn-sm btn-primary" onclick="editItem('${item.id}')">編輯</button>
-                        <button class="btn btn-sm btn-danger" onclick="deleteItem('${item.id}')">刪除</button>
+                    <div class="notes-container" id="notes-${item.id}">
+                        <div class="notes-display" id="notes-display-${item.id}">
+                            <span class="notes-text">${item.notes || '無備註'}</span>
+                            <button class="btn btn-sm btn-outline-secondary notes-edit-btn" onclick="startEditNotes('${item.id}')" title="編輯備註">
+                                編輯
+                            </button>
+                        </div>
+                        <div class="notes-edit" id="notes-edit-${item.id}" style="display: none;">
+                            <textarea class="form-control notes-textarea" id="notes-input-${item.id}" rows="2" style="min-height: 60px; resize: vertical;">${item.notes || ''}</textarea>
+                            <div class="notes-actions mt-2">
+                                <button class="btn btn-sm btn-success" onclick="saveNotes('${item.id}')">✔ 儲存</button>
+                                <button class="btn btn-sm btn-secondary" onclick="cancelEditNotes('${item.id}')">✖ 取消</button>
+                            </div>
+                        </div>
                     </div>
                 </td>
+                ${canEdit ? `<td class="px-4 py-3">
+                    <div class="actions">
+                        ${editButtonHTML}
+                        ${deleteButtonHTML}
+                    </div>
+                </td>` : ''}
             </tr>
         `;
     }).join('');
@@ -491,6 +571,13 @@ function renderTable() {
 }
 
 function editItem(id) {
+    // 檢查是否有編輯權限
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('edit') !== '1') {
+        showToast('❌ 無編輯權限', 2000);
+        return;
+    }
+
     currentEditId = id;
     const item = shoppingList.find(i => i.id === id);
 
@@ -512,6 +599,13 @@ function editItem(id) {
 }
 
 function toggleAddForm() {
+    // 檢查是否有編輯權限
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('edit') !== '1') {
+        showToast('❌ 無新增權限', 2000);
+        return;
+    }
+
     currentEditId = null;
     document.getElementById('editForm').reset();
     document.getElementById('editDate').value = new Date().toISOString().split('T')[0];
@@ -529,7 +623,6 @@ async function updateShipment(id, value) {
 
     item.shipment = value;
 
-    showLoading(true);
     try {
         const response = await fetch(`${API_BASE_URL}/api/items/${id}`, {
             method: 'PUT',
@@ -539,10 +632,95 @@ async function updateShipment(id, value) {
 
         const result = await response.json();
         if (result.success) {
-            showNotification(t('notifyUpdateSuccess'));
+            showToast(t('notifyUpdateSuccess'), 1500);
         }
-    } finally {
-        showLoading(false);
+    } catch (error) {
+        console.error('❌ 更新錯誤:', error);
+    }
+}
+
+// 開始編輯備註
+function startEditNotes(id) {
+    const displayDiv = document.getElementById(`notes-display-${id}`);
+    const editDiv = document.getElementById(`notes-edit-${id}`);
+
+    if (displayDiv && editDiv) {
+        displayDiv.style.display = 'none';
+        editDiv.style.display = 'block';
+
+        // 聚焦到文字框
+        const textarea = document.getElementById(`notes-input-${id}`);
+        if (textarea) {
+            textarea.focus();
+            // 將游標移到文字末端
+            textarea.setSelectionRange(textarea.value.length, textarea.value.length);
+        }
+    }
+}
+
+// 取消編輯備註
+function cancelEditNotes(id) {
+    const displayDiv = document.getElementById(`notes-display-${id}`);
+    const editDiv = document.getElementById(`notes-edit-${id}`);
+    const item = shoppingList.find(i => i.id === id);
+
+    if (displayDiv && editDiv && item) {
+        // 恢復原始值
+        const textarea = document.getElementById(`notes-input-${id}`);
+        if (textarea) {
+            textarea.value = item.notes || '';
+        }
+
+        displayDiv.style.display = 'flex';
+        editDiv.style.display = 'none';
+    }
+}
+
+// 儲存備註
+async function saveNotes(id) {
+    const textarea = document.getElementById(`notes-input-${id}`);
+    const item = shoppingList.find(i => i.id === id);
+
+    if (!textarea || !item) return;
+
+    const newValue = textarea.value.trim();
+
+    // 如果備註沒有變化，直接關閉編輯模式
+    if (item.notes === newValue) {
+        cancelEditNotes(id);
+        return;
+    }
+
+    item.notes = newValue;
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/items/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(item)
+        });
+
+        const result = await response.json();
+        if (result.success) {
+            showToast('✅ 備註已更新', 1500);
+
+            // 更新顯示文字
+            const displayText = document.querySelector(`#notes-display-${id} .notes-text`);
+            if (displayText) {
+                displayText.textContent = newValue || '無備註';
+            }
+
+            // 關閉編輯模式
+            const displayDiv = document.getElementById(`notes-display-${id}`);
+            const editDiv = document.getElementById(`notes-edit-${id}`);
+            if (displayDiv && editDiv) {
+                displayDiv.style.display = 'flex';
+                editDiv.style.display = 'none';
+            }
+        }
+    } catch (error) {
+        console.error('❌ 更新備註錯誤:', error);
+        showToast('❌ 備註更新失敗', 2000);
     }
 }
 
@@ -603,10 +781,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // 先檢查驗證狀態
     checkAuth();
 
-    // 檢查 URL 參數 add=1
+    // 檢查 URL 參數 edit=1
     const params = new URLSearchParams(window.location.search);
     const addBtn = document.getElementById('addBtn');
-    if (params.get('add') === '1' && addBtn) {
+    if (params.get('edit') === '1' && addBtn) {
         addBtn.style.display = 'block';
     }
 
