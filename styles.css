@@ -254,13 +254,19 @@
     height: 100%;
     background-color: rgba(0, 0, 0, 0.95);
     animation: fadeIn 0.3s ease;
+    overflow-y: auto;
+    /* 允許垂直滾動 */
 }
 
 .lightbox.show {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
+    /* 改為從頂部開始，以支援滾動 */
+    padding-top: 50px;
+    /* 預留頂部空間關閉按鈕 */
+    padding-bottom: 50px;
 }
 
 @keyframes fadeIn {
@@ -274,7 +280,8 @@
 }
 
 .lightbox-close {
-    position: absolute;
+    position: fixed;
+    /* 固定在螢幕右上角，不受滾動影響 */
     top: 20px;
     right: 30px;
     color: white;
@@ -283,8 +290,10 @@
     cursor: pointer;
     background: none;
     border: none;
-    z-index: 10;
+    z-index: 2001;
+    /* 提高層級 */
     padding: 0;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .lightbox-close:hover {
@@ -296,23 +305,32 @@
     align-items: center;
     justify-content: center;
     width: 100%;
-    height: 100%;
+    min-height: 100%;
+    /* 確保至少滿版 */
     position: relative;
+    pointer-events: none;
+    /* 讓容器不阻擋點擊 */
 }
 
 .lightbox-image-wrapper {
     display: flex;
     align-items: center;
     justify-content: center;
-    max-width: 90%;
-    max-height: 80%;
+    max-width: 95%;
+    /* 增加寬度佔比 */
+    /* 移除 max-height 限制，讓長圖可以自然展開 */
+    margin: 20px auto;
+    pointer-events: auto;
+    /* 恢復圖片交互 */
 }
 
 .lightbox-image-wrapper img {
     max-width: 100%;
-    max-height: 100%;
+    height: auto;
+    /* 自動高度 */
     object-fit: contain;
     border-radius: 5px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
 }
 
 .lightbox-nav {
