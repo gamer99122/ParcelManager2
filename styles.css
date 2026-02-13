@@ -194,6 +194,24 @@
     word-wrap: break-word;
 }
 
+/* 表格斑馬條紋效果 */
+.table.shopping-table tbody tr:nth-child(odd) td {
+    background-color: #ffffff !important;
+    /* 奇數列：白色 */
+}
+
+.table.shopping-table tbody tr:nth-child(even) td {
+    background-color: #e9ecef !important;
+    /* 偶數列：較深的灰色，更明顯 */
+}
+
+/* hover 效果 */
+.table-hover.shopping-table tbody tr:hover td {
+    background-color: #e7f3ff !important;
+    /* 滑鼠懸停時的淺藍色 */
+    transition: background-color 0.2s ease;
+}
+
 .col-date {
     width: 12%;
     min-width: 100px;

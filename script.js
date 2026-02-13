@@ -97,7 +97,10 @@ async function saveEdit(event) {
             images: [
                 document.getElementById('editImage1').value,
                 document.getElementById('editImage2').value,
-                document.getElementById('editImage3').value
+                document.getElementById('editImage3').value,
+                document.getElementById('editImage4').value,
+                document.getElementById('editImage5').value,
+                document.getElementById('editImage6').value
             ],
             brand: document.getElementById('editBrand').value,
             notes: document.getElementById('editNotes').value,
@@ -221,6 +224,9 @@ function editItem(id) {
     document.getElementById('editImage1').value = item.images?.[0] || '';
     document.getElementById('editImage2').value = item.images?.[1] || '';
     document.getElementById('editImage3').value = item.images?.[2] || '';
+    document.getElementById('editImage4').value = item.images?.[3] || '';
+    document.getElementById('editImage5').value = item.images?.[4] || '';
+    document.getElementById('editImage6').value = item.images?.[5] || '';
     document.getElementById('editBrand').value = item.brand || '';
     document.getElementById('editNotes').value = item.notes || '';
     document.getElementById('editShipment').value = item.shipment || '空白';

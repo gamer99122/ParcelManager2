@@ -83,7 +83,7 @@ app.post('/api/items', async (req, res) => {
         const item = {
             date: req.body.date,
             sequence: req.body.sequence,
-            images: req.body.images || ['', '', ''],
+            images: req.body.images || ['', '', '', '', '', ''],
             brand: req.body.brand,
             notes: req.body.notes,
             shipment: req.body.shipment || '空白',
@@ -118,7 +118,7 @@ app.put('/api/items/:id', async (req, res) => {
         const updatedItem = {
             date: req.body.date,
             sequence: req.body.sequence,
-            images: req.body.images || ['', '', ''],
+            images: req.body.images || ['', '', '', '', '', ''],
             brand: req.body.brand,
             notes: req.body.notes,
             shipment: req.body.shipment || '空白',
