@@ -101,6 +101,13 @@ async function saveEdit(event) {
     isSaving = true;
     showLoading(true);
 
+    // 禁用提交按鈕
+    const submitBtn = event.target?.querySelector('button[type="submit"]');
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        console.log('🔒 提交按鈕已禁用');
+    }
+
     const requestId = Math.random().toString(36).substring(7);
     console.log(`📝 [${requestId}] saveEdit 開始執行`);
 
@@ -158,6 +165,14 @@ async function saveEdit(event) {
     } finally {
         isSaving = false;
         showLoading(false);
+
+        // 恢復提交按鈕
+        const submitBtn = document.querySelector('#editForm button[type="submit"]');
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            console.log('🔓 提交按鈕已恢復');
+        }
+
         console.log(`📝 [${requestId}] saveEdit 執行完成`);
     }
 }
