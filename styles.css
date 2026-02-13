@@ -769,9 +769,7 @@
         color: #525f7f;
     }
 
-    /* 寄送狀態下拉選單 */
-    .shopping-table td[data-label="寄送狀態"],
-    .shopping-table td[data-label="配送状況"] {}
+
 
     .form-select-sm {
         width: 100%;
@@ -797,4 +795,42 @@
         justify-content: center;
         align-items: center;
     }
+}
+
+/* 新增 # 欄位樣式 */
+.col-index {
+    width: 60px;
+    text-align: center;
+    color: #6c757d;
+}
+
+/* 當日序號 Badge 樣式 */
+.sequence-badge {
+    font-size: 0.95rem;
+    padding: 0.35em 0.65em;
+    font-weight: 600;
+}
+
+/* 手機版適配 # 欄位 */
+@media (max-width: 768px) {
+    .shopping-table td[data-label="#"] {
+        background-color: #f8f9fa;
+        color: #6c757d;
+        font-weight: bold;
+        font-size: 0.9rem;
+        padding: 8px 16px;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .shopping-table td[data-label="#"]::before {
+        content: "No.";
+        margin-right: 8px;
+        color: #adb5bd;
+    }
+}
+
+/* 檢視模式下 (無權限) 的表格樣式調整 */
+.shopping-table.view-mode .col-notes {
+    width: auto;
+    /* 讓備註欄位自動填滿剩餘空間 */
 }

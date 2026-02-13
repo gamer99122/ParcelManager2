@@ -173,24 +173,29 @@ function updatePageLanguage() {
 
     // 更新表格標題
     const headers = document.querySelectorAll('thead th');
+    const actionsHeader = document.getElementById('actionsHeader');
     const params = new URLSearchParams(window.location.search);
     const canEdit = params.get('edit') === '1';
 
-    if (canEdit && headers.length >= 7) {
-        headers[0].textContent = t('tableDate');
-        headers[1].textContent = t('tableSequence');
-        headers[2].textContent = t('tableImage');
-        headers[3].textContent = t('tableBrand');
-        headers[4].textContent = t('tableShipment');
-        headers[5].textContent = t('tableNotes');
-        headers[6].textContent = t('tableActions');
-    } else if (!canEdit && headers.length >= 6) {
-        headers[0].textContent = t('tableDate');
-        headers[1].textContent = t('tableSequence');
-        headers[2].textContent = t('tableImage');
-        headers[3].textContent = t('tableBrand');
-        headers[4].textContent = t('tableShipment');
-        headers[5].textContent = t('tableNotes');
+    // 設定表頭文字
+    if (headers.length >= 8) {
+        headers[0].textContent = '#';
+        headers[1].textContent = t('tableDate');
+        headers[2].textContent = t('tableSequence');
+        headers[3].textContent = t('tableImage');
+        headers[4].textContent = t('tableBrand');
+        headers[5].textContent = t('tableShipment');
+        headers[6].textContent = t('tableNotes');
+        if (headers[7]) headers[7].textContent = t('tableActions');
+    }
+
+    // 根據權限顯示/隱藏操作欄位表頭
+    if (canEdit) {
+        if (actionsHeader) actionsHeader.style.display = '';
+        document.querySelector('.shopping-table').classList.remove('view-mode');
+    } else {
+        if (actionsHeader) actionsHeader.style.display = 'none';
+        document.querySelector('.shopping-table').classList.add('view-mode');
     }
 
     // 更新編輯表單
@@ -206,11 +211,7 @@ function updatePageLanguage() {
         loadingHint.innerHTML = `<i class="bi bi-info-circle"></i> ${t('loadingHint')}`;
     }
 
-    // 隱藏或顯示操作欄標題
-    const actionsHeader = document.getElementById('actionsHeader');
-    if (actionsHeader) {
-        actionsHeader.style.display = canEdit ? '' : 'none';
-    }
+
 
     // 更新語言選擇器按鈕狀態
     updateLanguageButtons();
@@ -504,7 +505,7 @@ function renderTable() {
     const params = new URLSearchParams(window.location.search);
     const canEdit = params.get('edit') === '1';
 
-    tableBody.innerHTML = sortedList.map(item => {
+    tableBody.innerHTML = sortedList.map((item, index) => {
         const validImages = (item.images || []).filter(img => img && img.trim());
         const imageHTML = validImages.length > 0 ?
             `<div class="image-gallery" onclick="openLightbox('${item.id}')">
@@ -528,8 +529,9 @@ function renderTable() {
 
         return `
             <tr>
+                <td class="px-3 py-3 fw-bold text-secondary" data-label="#">${index + 1}</td>
                 <td class="date px-4 py-3" data-label="${t('tableDate')}">${formatDate(item.date)}</td>
-                <td class="px-4 py-3" data-label="${t('tableSequence')}"><span class="sequence">${item.sequence}</span></td>
+                <td class="px-4 py-3" data-label="${t('tableSequence')}"><span class="badge bg-light text-dark border sequence-badge">${item.sequence}</span></td>
                 <td class="px-4 py-3" data-label="${t('tableImage')}">${imageHTML}</td>
                 <td class="px-4 py-3" data-label="${t('tableBrand')}">${item.brand || '-'}</td>
                 <td class="px-4 py-3" data-label="${t('tableShipment')}">
