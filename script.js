@@ -584,10 +584,10 @@ function renderTable() {
 
         // 根據參數決定是否顯示編輯和刪除按鈕
         const editButtonHTML = canEdit
-            ? `<button class="btn btn-sm btn-primary" onclick="editItem('${item.id}')">編輯</button>`
+            ? `<button class="btn btn-sm btn-primary" onclick="editItem('${item.id}')">${t('editButton')}</button>`
             : '';
         const deleteButtonHTML = canEdit
-            ? `<button class="btn btn-sm btn-danger" onclick="deleteItem('${item.id}')">刪除</button>`
+            ? `<button class="btn btn-sm btn-danger" onclick="deleteItem('${item.id}')">${t('deleteButton')}</button>`
             : '';
 
 
