@@ -75,6 +75,10 @@ app.get('/api/items', async (req, res) => {
 
 // 新增項目
 app.post('/api/items', async (req, res) => {
+    const requestId = Math.random().toString(36).substring(7);
+    console.log(`📝 [${requestId}] POST /api/items 收到請求`);
+    console.log(`📝 [${requestId}] 數據:`, { sequence: req.body.sequence, date: req.body.date });
+
     try {
         const item = {
             date: req.body.date,
@@ -87,7 +91,9 @@ app.post('/api/items', async (req, res) => {
             updatedAt: new Date()
         };
 
+        console.log(`📝 [${requestId}] 準備插入 MongoDB...`);
         const result = await itemsCollection.insertOne(item);
+        console.log(`📝 [${requestId}] ✅ 插入成功，ID: ${result.insertedId}`);
 
         res.status(201).json({
             success: true,
@@ -95,7 +101,7 @@ app.post('/api/items', async (req, res) => {
             message: '新增成功'
         });
     } catch (error) {
-        console.error('新增錯誤:', error);
+        console.error(`❌ [${requestId}] 新增錯誤:`, error);
         res.status(500).json({
             success: false,
             message: '新增失敗: ' + error.message
