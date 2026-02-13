@@ -376,6 +376,13 @@ document.addEventListener('DOMContentLoaded', () => {
         window.location.href = window.location.pathname;
     }
 
-    document.getElementById('editForm').addEventListener('submit', saveEdit);
+    const editForm = document.getElementById('editForm');
+    if (editForm) {
+        console.log('✅ editForm 已找到');
+    } else {
+        console.error('❌ editForm 未找到！');
+    }
+
+    console.log('🚀 初始化完成，開始載入資料');
     loadDataFromAPI();
 });

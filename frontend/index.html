@@ -88,7 +88,7 @@
                     <button type="button" class="btn-close" onclick="closeEditModal()" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="editForm">
+                    <form id="editForm" onsubmit="saveEdit(event)">
                         <div class="mb-3">
                             <label for="editDate" class="form-label fw-bold">收件日期</label>
                             <input type="date" class="form-control" id="editDate" required>
