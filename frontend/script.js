@@ -70,6 +70,7 @@ async function loadDataFromAPI(retryCount = 0) {
                 ...item,
                 id: item._id // MongoDB 使用 _id
             }));
+            console.log('📊 shoppingList 已更新，共', shoppingList.length, '筆:', shoppingList.map(item => ({ id: item.id, sequence: item.sequence })));
             renderTable();
             showNotification('✅ 資料已同步');
         } else {
@@ -139,12 +140,13 @@ async function saveEdit(event) {
         console.log(`📝 [${requestId}] 回應數據:`, result);
 
         if (result.success) {
-            console.log(`📝 [${requestId}] 儲存成功，關閉模態框`);
+            console.log(`📝 [${requestId}] ✅ 儲存成功！創建的資料:`, result.data);
+            console.log(`📝 [${requestId}] 關閉模態框`);
             closeEditModal();
 
             console.log(`📝 [${requestId}] 開始重新加載數據...`);
             await loadDataFromAPI();
-            console.log(`📝 [${requestId}] 數據重新加載完成`);
+            console.log(`📝 [${requestId}] 數據重新加載完成。目前 shoppingList 有 ${shoppingList.length} 筆`);
 
             showNotification('✅ 儲存成功');
         } else {
@@ -201,6 +203,11 @@ function renderTable() {
     const sortedList = [...shoppingList].sort((a, b) =>
         String(a.date).localeCompare(String(b.date))
     );
+
+    console.log('🎨 renderTable: 準備渲染', sortedList.length, '筆項目');
+    sortedList.forEach((item, idx) => {
+        console.log(`  [${idx + 1}] ID: ${item.id}, 序號: ${item.sequence}`);
+    });
 
     tableBody.innerHTML = sortedList.map(item => {
         const validImages = (item.images || []).filter(img => img && img.trim());
