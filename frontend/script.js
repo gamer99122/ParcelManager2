@@ -1,6 +1,6 @@
 // ===== API 配置 =====
-// 修改為您的 Railway 後端 URL
-const API_BASE_URL = localStorage.getItem('apiUrl') || 'http://localhost:3000';
+// Railway 後端 URL
+const API_BASE_URL = 'https://parcelmanager2-production.up.railway.app';
 
 // 數據存儲
 let shoppingList = [];
