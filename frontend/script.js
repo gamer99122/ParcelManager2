@@ -7,6 +7,7 @@ let shoppingList = [];
 let currentEditId = null;
 let currentLightboxItemId = null;
 let currentImageIndex = 0;
+let isSaving = false; // 防止重複提交
 
 // ===== 工具函數 =====
 
@@ -88,6 +89,14 @@ async function loadDataFromAPI(retryCount = 0) {
 
 async function saveEdit(event) {
     event.preventDefault();
+
+    // 防止重複提交
+    if (isSaving) {
+        console.log('⚠️ 正在儲存，請勿重複提交');
+        return;
+    }
+
+    isSaving = true;
     showLoading(true);
 
     try {
@@ -112,6 +121,8 @@ async function saveEdit(event) {
             method = 'PUT';
         }
 
+        console.log('📝 正在儲存..., method:', method);
+
         const response = await fetch(url, {
             method: method,
             headers: { 'Content-Type': 'application/json' },
@@ -131,6 +142,7 @@ async function saveEdit(event) {
         console.error('❌ 儲存錯誤:', error);
         showNotification('❌ 錯誤: ' + error.message);
     } finally {
+        isSaving = false;
         showLoading(false);
     }
 }
