@@ -216,6 +216,21 @@ function updatePageLanguage() {
         loadingHint.innerHTML = `<i class="bi bi-info-circle"></i> ${t('loadingHint')}`;
     }
 
+    // 更新其他介面元素
+    const totalCountLabel = document.getElementById('totalCountLabel');
+    const itemCountSuffix = document.getElementById('itemCountSuffix');
+    const loadingText = document.getElementById('loadingText');
+    const tableLoadingText = document.getElementById('tableLoadingText');
+    const btnCancel = document.getElementById('btnCancel');
+    const btnSave = document.getElementById('btnSave');
+
+    if (totalCountLabel) totalCountLabel.textContent = t('totalCount');
+    if (itemCountSuffix) itemCountSuffix.textContent = t('itemCount');
+    if (loadingText) loadingText.textContent = t('loading');
+    if (tableLoadingText) tableLoadingText.textContent = t('loading');
+    if (btnCancel) btnCancel.textContent = t('cancelButton');
+    if (btnSave) btnSave.textContent = t('saveButton');
+
 
 
     // 更新語言選擇器按鈕狀態
