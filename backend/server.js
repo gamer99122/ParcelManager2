@@ -21,11 +21,17 @@ let itemsCollection;
 // 連接 MongoDB
 async function connectDB() {
     try {
+        console.log('🔌 正在連接 MongoDB...');
+        console.log('📍 MongoDB URI:', MONGO_URI.substring(0, 50) + '...');
+
         const client = new MongoClient(MONGO_URI, {
             maxPoolSize: 10,
+            retryWrites: true,
+            w: 'majority'
         });
+
         await client.connect();
-        console.log('✅ MongoDB 已連接');
+        console.log('✅ MongoDB 已連接成功');
 
         db = client.db(DB_NAME);
         itemsCollection = db.collection(COLLECTION_NAME);
@@ -33,9 +39,13 @@ async function connectDB() {
         // 建立索引
         await itemsCollection.createIndex({ date: 1 });
         await itemsCollection.createIndex({ createdAt: 1 });
+        console.log('✅ 索引已建立');
+
+        return true;
     } catch (error) {
-        console.error('❌ MongoDB 連接失敗:', error);
-        process.exit(1);
+        console.error('❌ MongoDB 連接失敗:', error.message);
+        console.error('完整錯誤:', error);
+        return false;
     }
 }
 
@@ -171,6 +181,11 @@ app.get('/health', (req, res) => {
 
 // 啟動服務器
 app.listen(PORT, async () => {
-    await connectDB();
-    console.log(`🚀 服務器運行於 http://localhost:${PORT}`);
+    console.log(`🚀 服務器運行於 port ${PORT}`);
+    console.log(`📍 環境變數 MONGODB_URI:`, process.env.MONGODB_URI ? '✅ 已設置' : '❌ 未設置');
+
+    const connected = await connectDB();
+    if (!connected) {
+        console.error('⚠️  警告：MongoDB 未連接，某些功能可能無法使用');
+    }
 });
