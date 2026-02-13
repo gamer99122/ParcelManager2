@@ -100,6 +100,9 @@ async function saveEdit(event) {
     isSaving = true;
     showLoading(true);
 
+    const requestId = Math.random().toString(36).substring(7);
+    console.log(`📝 [${requestId}] saveEdit 開始執行`);
+
     try {
         const itemData = {
             date: document.getElementById('editDate').value,
@@ -122,7 +125,8 @@ async function saveEdit(event) {
             method = 'PUT';
         }
 
-        console.log('📝 正在儲存..., method:', method);
+        console.log(`📝 [${requestId}] 正在發送 ${method} 請求到:`, url);
+        console.log(`📝 [${requestId}] 數據:`, itemData);
 
         const response = await fetch(url, {
             method: method,
@@ -130,21 +134,29 @@ async function saveEdit(event) {
             body: JSON.stringify(itemData)
         });
 
+        console.log(`📝 [${requestId}] 收到回應，狀態: ${response.status}`);
         const result = await response.json();
+        console.log(`📝 [${requestId}] 回應數據:`, result);
 
         if (result.success) {
+            console.log(`📝 [${requestId}] 儲存成功，關閉模態框`);
             closeEditModal();
+
+            console.log(`📝 [${requestId}] 開始重新加載數據...`);
             await loadDataFromAPI();
+            console.log(`📝 [${requestId}] 數據重新加載完成`);
+
             showNotification('✅ 儲存成功');
         } else {
             showNotification('❌ 儲存失敗: ' + result.message);
         }
     } catch (error) {
-        console.error('❌ 儲存錯誤:', error);
+        console.error(`❌ [${requestId}] 儲存錯誤:`, error);
         showNotification('❌ 錯誤: ' + error.message);
     } finally {
         isSaving = false;
         showLoading(false);
+        console.log(`📝 [${requestId}] saveEdit 執行完成`);
     }
 }
 
