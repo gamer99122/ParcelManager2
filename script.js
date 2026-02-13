@@ -241,16 +241,24 @@ function updateFormLabels() {
         const currentValue = shipmentSelect.value;
 
         shipmentSelect.innerHTML = `
-            <option value="空白">${t('shipmentBlank')}</option>
-            <option value="不寄送">${t('shipmentNo')}</option>
-            <option value="寄送">${t('shipmentYes')}</option>
-            <option value="部分寄送">${t('shipmentPartial')}</option>
+            <option value="空白" class="status-blank">${t('shipmentBlank')}</option>
+            <option value="不寄送" class="status-no">${t('shipmentNo')}</option>
+            <option value="寄送" class="status-yes">${t('shipmentYes')}</option>
+            <option value="部分寄送" class="status-partial">${t('shipmentPartial')}</option>
         `;
 
         // 恢復選中的值 (如果值存在)
         if (currentValue) {
             shipmentSelect.value = currentValue;
         }
+
+        // 初始化顏色
+        updateShipmentColor(shipmentSelect);
+
+        // 綁定變更事件以更新顏色
+        shipmentSelect.onchange = function () {
+            updateShipmentColor(this);
+        };
     }
 }
 
@@ -559,11 +567,11 @@ function renderTable() {
                 <td class="px-4 py-3" data-label="${t('tableImage')}">${imageHTML}</td>
                 <td class="px-4 py-3" data-label="${t('tableBrand')}">${item.brand || '-'}</td>
                 <td class="px-4 py-3" data-label="${t('tableShipment')}">
-                    <select class="form-select form-select-sm" onchange="updateShipment('${item.id}', this.value)">
-                        <option value="空白" ${item.shipment === '空白' ? 'selected' : ''}>${t('shipmentBlank')}</option>
-                        <option value="不寄送" ${item.shipment === '不寄送' ? 'selected' : ''}>${t('shipmentNo')}</option>
-                        <option value="寄送" ${item.shipment === '寄送' ? 'selected' : ''}>${t('shipmentYes')}</option>
-                        <option value="部分寄送" ${item.shipment === '部分寄送' ? 'selected' : ''}>${t('shipmentPartial')}</option>
+                    <select class="form-select form-select-sm ${getShipmentClass(item.shipment)}" onchange="updateShipmentColor(this); updateShipment('${item.id}', this.value)">
+                        <option value="空白" class="status-blank" ${item.shipment === '空白' ? 'selected' : ''}>${t('shipmentBlank')}</option>
+                        <option value="不寄送" class="status-no" ${item.shipment === '不寄送' ? 'selected' : ''}>${t('shipmentNo')}</option>
+                        <option value="寄送" class="status-yes" ${item.shipment === '寄送' ? 'selected' : ''}>${t('shipmentYes')}</option>
+                        <option value="部分寄送" class="status-partial" ${item.shipment === '部分寄送' ? 'selected' : ''}>${t('shipmentPartial')}</option>
                     </select>
                 </td>
                 <td class="px-4 py-3" data-label="${t('tableNotes')}">
@@ -801,6 +809,27 @@ function nextImage() {
         showLightboxImage();
     }
 }
+
+// 取得寄送狀態對應的 CSS class
+function getShipmentClass(status) {
+    switch (status) {
+        case '不寄送': return 'status-no';
+        case '寄送': return 'status-yes';
+        case '部分寄送': return 'status-partial';
+        default: return 'status-blank';
+    }
+}
+
+// 更新下拉選單顏色
+function updateShipmentColor(selectElement) {
+    // 移除舊的顏色 class
+    selectElement.classList.remove('status-blank', 'status-no', 'status-yes', 'status-partial');
+    // 加入新的顏色 class
+    selectElement.classList.add(getShipmentClass(selectElement.value));
+}
+
+// 綁定全域函數，供 HTML inline calls 使用
+window.updateShipmentColor = updateShipmentColor;
 
 // ===== 初始化 =====
 

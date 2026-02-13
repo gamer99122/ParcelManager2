@@ -847,6 +847,31 @@
     }
 }
 
+/* 寄送狀態顏色 */
+.status-blank {
+    background-color: #ffffff;
+    color: #212529;
+}
+
+.status-no {
+    background-color: #ffebee;
+    color: #c62828;
+}
+
+/* 淺紅 */
+.status-yes {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+}
+
+/* 淺綠 */
+.status-partial {
+    background-color: #fff3e0;
+    color: #ef6c00;
+}
+
+/* 淺橘 */
+
 /* 檢視模式下 (無權限) 的表格樣式調整 */
 .shopping-table.view-mode .col-notes {
     width: auto;
