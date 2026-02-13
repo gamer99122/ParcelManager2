@@ -326,6 +326,8 @@
 
 .lightbox-image-wrapper img {
     max-width: 100%;
+    max-height: 85vh;
+    /* 限制高度為視窗高度的 85% */
     height: auto;
     /* 自動高度 */
     object-fit: contain;
