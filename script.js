@@ -52,6 +52,8 @@ const translations = {
         notifyDeleteSuccess: '✅ 已刪除',
         notifyDeleteError: '❌ 刪除失敗',
         notifyUpdateSuccess: '✅ 狀態已更新',
+        notifyNoteSuccess: '✅ 備註已更新',
+        notifyNoteError: '❌ 備註更新失敗',
 
         // 其他
         deleteConfirm: '確定刪除？',
@@ -59,6 +61,7 @@ const translations = {
         loadingData: '正在載入資料...',
         loadingHint: '如果清單載入不順利，請按下「重新整理」按鈕',
         noImage: '無圖片',
+        noNotes: '無備註',
         itemCount: '項商品',
         totalCount: '總共',
         imagePlaceholder: '圖片'
@@ -115,6 +118,8 @@ const translations = {
         notifyDeleteSuccess: '✅ 削除しました',
         notifyDeleteError: '❌ 削除に失敗しました',
         notifyUpdateSuccess: '✅ 状態を更新しました',
+        notifyNoteSuccess: '✅ 備考を更新しました',
+        notifyNoteError: '❌ 備考の更新に失敗しました',
 
         // その他
         deleteConfirm: '削除してもよろしいですか？',
@@ -122,6 +127,7 @@ const translations = {
         loadingData: 'データを読み込んでいます...',
         loadingHint: 'リストの読み込みがうまくいかない場合は、「更新」ボタンを押してください',
         noImage: '画像なし',
+        noNotes: '備考なし',
         itemCount: '件の商品',
         totalCount: '合計',
         imagePlaceholder: '画像'
@@ -603,16 +609,16 @@ function renderTable() {
                 <td class="px-4 py-3" data-label="${t('tableNotes')}">
                     <div class="notes-container" id="notes-${item.id}">
                         <div class="notes-display" id="notes-display-${item.id}">
-                            <span class="notes-text">${item.notes || '無備註'}</span>
-                            <button class="btn btn-sm btn-outline-secondary notes-edit-btn" onclick="startEditNotes('${item.id}')" title="編輯備註">
-                                編輯
+                            <span class="notes-text">${item.notes || t('noNotes')}</span>
+                            <button class="btn btn-sm btn-outline-secondary notes-edit-btn" onclick="startEditNotes('${item.id}')" title="${t('editTitle')}">
+                                ${t('editButton')}
                             </button>
                         </div>
                         <div class="notes-edit" id="notes-edit-${item.id}" style="display: none;">
                             <textarea class="form-control notes-textarea" id="notes-input-${item.id}" rows="2" style="min-height: 60px; resize: vertical;">${item.notes || ''}</textarea>
                             <div class="notes-actions mt-2">
-                                <button class="btn btn-sm btn-success" onclick="saveNotes('${item.id}')">✔ 儲存</button>
-                                <button class="btn btn-sm btn-secondary" onclick="cancelEditNotes('${item.id}')">✖ 取消</button>
+                                <button class="btn btn-sm btn-success" onclick="saveNotes('${item.id}')">✔ ${t('saveButton')}</button>
+                                <button class="btn btn-sm btn-secondary" onclick="cancelEditNotes('${item.id}')">✖ ${t('cancelButton')}</button>
                             </div>
                         </div>
                     </div>
@@ -763,12 +769,12 @@ async function saveNotes(id) {
 
         const result = await response.json();
         if (result.success) {
-            showToast('✅ 備註已更新', 1500);
+            showToast(t('notifyNoteSuccess'), 1500);
 
             // 更新顯示文字
             const displayText = document.querySelector(`#notes-display-${id} .notes-text`);
             if (displayText) {
-                displayText.textContent = newValue || '無備註';
+                displayText.textContent = newValue || t('noNotes');
             }
 
             // 關閉編輯模式
@@ -781,7 +787,7 @@ async function saveNotes(id) {
         }
     } catch (error) {
         console.error('❌ 更新備註錯誤:', error);
-        showToast('❌ 備註更新失敗', 2000);
+        showToast(t('notifyNoteError'), 2000);
     }
 }
 
