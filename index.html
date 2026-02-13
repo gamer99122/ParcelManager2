@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,11 +8,13 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
+
 <body class="bg-light">
     <div class="container-fluid py-5">
         <div class="container">
             <!-- 頁面標題 -->
-            <div class="text-white rounded-3 p-5 mb-5 shadow-lg" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+            <div class="text-white rounded-3 p-5 mb-5 shadow-lg"
+                style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
                 <div class="d-flex justify-content-between align-items-start mb-3">
                     <div>
                         <h1 class="display-4 mb-2">📦 包裹清單管理</h1>
@@ -31,7 +34,9 @@
             </div>
 
             <!-- 加載動畫 -->
-            <div id="loadingOverlay" class="d-none position-fixed start-0 top-0 w-100 h-100 bg-dark bg-opacity-50 d-flex align-items-center justify-content-center" style="z-index: 9999;">
+            <div id="loadingOverlay"
+                class="d-none position-fixed start-0 top-0 w-100 h-100 bg-dark bg-opacity-50 d-flex align-items-center justify-content-center"
+                style="z-index: 9999;">
                 <div class="spinner-border text-light" role="status">
                     <span class="visually-hidden">Loading...</span>
                 </div>
@@ -52,7 +57,9 @@
                         </tr>
                     </thead>
                     <tbody id="tableBody">
-                        <tr><td colspan="7" class="text-center py-4">載入中...</td></tr>
+                        <tr>
+                            <td colspan="7" class="text-center py-4">載入中...</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -88,7 +95,7 @@
                     <button type="button" class="btn-close" onclick="closeEditModal()" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="editForm" onsubmit="saveEdit(event)">
+                    <form id="editForm">
                         <div class="mb-3">
                             <label for="editDate" class="form-label fw-bold">收件日期</label>
                             <input type="date" class="form-control" id="editDate" required>
@@ -133,4 +140,5 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="script.js"></script>
 </body>
+
 </html>
