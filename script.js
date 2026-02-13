@@ -852,6 +852,43 @@ function nextImage() {
     }
 }
 
+// ===== 觸控滑動支援 =====
+let touchStartX = 0;
+let touchEndX = 0;
+
+function handleTouchStart(e) {
+    touchStartX = e.changedTouches[0].screenX;
+}
+
+function handleTouchEnd(e) {
+    touchEndX = e.changedTouches[0].screenX;
+    handleSwipe();
+}
+
+function handleSwipe() {
+    const swipeThreshold = 50; // 最小滑動距離
+    const diff = touchStartX - touchEndX;
+
+    if (Math.abs(diff) > swipeThreshold) {
+        if (diff > 0) {
+            // 向左滑動 - 下一張
+            nextImage();
+        } else {
+            // 向右滑動 - 上一張
+            prevImage();
+        }
+    }
+}
+
+// 初始化觸控事件監聽器
+function initLightboxTouchEvents() {
+    const lightbox = document.getElementById('lightbox');
+    if (lightbox) {
+        lightbox.addEventListener('touchstart', handleTouchStart, { passive: true });
+        lightbox.addEventListener('touchend', handleTouchEnd, { passive: true });
+    }
+}
+
 // 取得寄送狀態對應的 CSS class
 function getShipmentClass(status) {
     switch (status) {
@@ -895,5 +932,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     document.getElementById('editForm').addEventListener('submit', saveEdit);
-    // loadDataFromAPI(); // 移除這裡的調用，改在登入成功後調用
+
+    // 初始化觸控滑動事件
+    initLightboxTouchEvents();
+    // loadDataFromAPI(); // 移除這裡的調用,改在登入成功後調用
 });

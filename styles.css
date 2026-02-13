@@ -308,8 +308,7 @@
     min-height: 100%;
     /* 確保至少滿版 */
     position: relative;
-    pointer-events: none;
-    /* 讓容器不阻擋點擊 */
+    /* 移除 pointer-events: none 以確保按鈕可點擊 */
 }
 
 .lightbox-image-wrapper {
@@ -347,7 +346,11 @@
     cursor: pointer;
     border-radius: 5px;
     transition: background 0.2s;
-    z-index: 5;
+    z-index: 2002;
+    pointer-events: auto;
+    /* 確保按鈕可點擊 */
+    -webkit-tap-highlight-color: transparent;
+    /* 移除手機點擊高亮 */
 }
 
 .lightbox-nav:hover {
@@ -529,22 +532,38 @@
 
     /* 燈箱控制 */
     .lightbox-nav {
-        font-size: 2em;
-        padding: 8px 15px;
+        font-size: 2.5em;
+        padding: 15px 25px;
+        /* 增加觸控區域 */
+        background: rgba(255, 255, 255, 0.5);
+        /* 增加可見度 */
+        min-width: 60px;
+        min-height: 60px;
+        /* 確保足夠的觸控目標大小 */
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     .lightbox-nav.prev {
-        left: 10px;
+        left: 5px;
     }
 
     .lightbox-nav.next {
-        right: 10px;
+        right: 5px;
     }
 
     .lightbox-close {
-        font-size: 2em;
+        font-size: 2.5em;
         top: 10px;
-        right: 15px;
+        right: 10px;
+        padding: 10px;
+        /* 增加觸控區域 */
+        min-width: 50px;
+        min-height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     /* 手機端載入動畫優化 */
