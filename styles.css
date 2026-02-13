@@ -484,7 +484,7 @@
     gap: 8px;
 }
 
-/* 響應式設計 */
+/* 響應式設計 - 平板 */
 @media (max-width: 768px) {
 
     /* 表格容器啟用水平滑動 */
@@ -497,25 +497,14 @@
 
     /* 表格最小寬度，確保不會擠在一起 */
     .shopping-table {
-        min-width: 800px !important;
-        /* 設定最小寬度，超過螢幕寬度時可以滑動 */
+        min-width: 100% !important;
+        /* 卡片模式設為100% */
     }
 
     /* 調整圖片大小 */
     .image-placeholder {
         width: 80px;
         height: 80px;
-    }
-
-    /* 調整按鈕大小 */
-    .actions {
-        flex-direction: row;
-        gap: 4px;
-    }
-
-    .actions .btn {
-        font-size: 0.75rem;
-        padding: 0.25rem 0.5rem;
     }
 
     /* 燈箱控制 */
@@ -536,18 +525,6 @@
         font-size: 2em;
         top: 10px;
         right: 15px;
-    }
-
-    /* 調整表格內距 */
-    .shopping-table th,
-    .shopping-table td {
-        padding: 0.5rem !important;
-        font-size: 0.9rem;
-    }
-
-    /* 序號欄位樣式 */
-    .sequence {
-        font-size: 0.85rem;
     }
 
     /* 手機端載入動畫優化 */
@@ -677,4 +654,147 @@
 .notes-actions .btn {
     font-size: 0.85rem;
     padding: 4px 12px;
+}
+
+/* 手機版卡片式表格優化 */
+@media (max-width: 768px) {
+    .container-fluid {
+        padding: 12px;
+    }
+
+    /* 隱藏表頭 */
+    .shopping-table thead {
+        display: none;
+    }
+
+    /* 表格列變卡片 */
+    .shopping-table tbody tr {
+        display: block;
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+        margin-bottom: 24px;
+        border: 1px solid #e9ecef;
+        overflow: hidden;
+        padding: 0;
+    }
+
+    /* 表格單元格樣式 - 改為區塊顯示 */
+    .shopping-table td {
+        display: block;
+        /* 讓內容換行 */
+        padding: 12px 20px;
+        border-bottom: 1px solid #f0f0f0;
+        text-align: left;
+        /* 內容靠左 */
+        min-height: auto;
+    }
+
+    .shopping-table td:last-child {
+        border-bottom: none;
+        background-color: #f8f9fa;
+        /* 操作區塊底色 */
+        padding: 16px 20px;
+    }
+
+    /* 標題標籤樣式 - 改為上方顯示 */
+    .shopping-table td::before {
+        content: attr(data-label);
+        display: block;
+        /* 標題獨佔一行 */
+        font-weight: 700;
+        color: #8898aa;
+        font-size: 0.85rem;
+        margin-bottom: 6px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    /* 重點欄位樣式加強 */
+    .shopping-table td[data-label="收件日期"],
+    .shopping-table td[data-label="日付"] {
+        background-color: #fff;
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+
+    .shopping-table td[data-label="序號"],
+    .shopping-table td[data-label="番号"] {
+        padding-top: 4px;
+        /* 接在日期後面 */
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #32325d;
+    }
+
+    /* 圖片欄位 */
+    .shopping-table td[data-label="圖片"],
+    .shopping-table td[data-label="画像"] {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        /* 圖片靠左 */
+        padding: 10px 20px;
+        background: white;
+    }
+
+    .image-gallery {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+        /* 圖片靠左排列 */
+        gap: 10px;
+        width: 100%;
+    }
+
+    .image-placeholder {
+        width: 100px;
+        height: 100px;
+        /* 手機上縮小一點點以免太佔空間 */
+    }
+
+    /* 備註欄位 - 增加閱讀舒適度 */
+    .shopping-table td[data-label="備註"],
+    .shopping-table td[data-label="備考"] {
+        background-color: #fff;
+    }
+
+    .notes-container {
+        width: 100%;
+    }
+
+    .notes-text {
+        font-size: 1rem;
+        line-height: 1.5;
+        color: #525f7f;
+    }
+
+    /* 寄送狀態下拉選單 */
+    .shopping-table td[data-label="寄送狀態"],
+    .shopping-table td[data-label="配送状況"] {}
+
+    .form-select-sm {
+        width: 100%;
+        /* 下拉選單滿寬，好點選 */
+        padding: 10px;
+        font-size: 1rem;
+    }
+
+    /* 操作按鈕 */
+    .actions {
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+        /* 按鈕靠右，符合操作習慣 */
+    }
+
+    .actions .btn {
+        flex: 1;
+        /* 按鈕均分寬度 */
+        padding: 10px;
+        font-size: 1rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
 }

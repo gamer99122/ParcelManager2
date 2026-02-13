@@ -528,11 +528,11 @@ function renderTable() {
 
         return `
             <tr>
-                <td class="date px-4 py-3">${formatDate(item.date)}</td>
-                <td class="px-4 py-3"><span class="sequence">${item.sequence}</span></td>
-                <td class="px-4 py-3">${imageHTML}</td>
-                <td class="px-4 py-3">${item.brand || '-'}</td>
-                <td class="px-4 py-3">
+                <td class="date px-4 py-3" data-label="${t('tableDate')}">${formatDate(item.date)}</td>
+                <td class="px-4 py-3" data-label="${t('tableSequence')}"><span class="sequence">${item.sequence}</span></td>
+                <td class="px-4 py-3" data-label="${t('tableImage')}">${imageHTML}</td>
+                <td class="px-4 py-3" data-label="${t('tableBrand')}">${item.brand || '-'}</td>
+                <td class="px-4 py-3" data-label="${t('tableShipment')}">
                     <select class="form-select form-select-sm" onchange="updateShipment('${item.id}', this.value)">
                         <option value="空白" ${item.shipment === '空白' ? 'selected' : ''}>空白</option>
                         <option value="不寄送" ${item.shipment === '不寄送' ? 'selected' : ''}>不寄送</option>
@@ -540,7 +540,7 @@ function renderTable() {
                         <option value="部分寄送" ${item.shipment === '部分寄送' ? 'selected' : ''}>部分寄送</option>
                     </select>
                 </td>
-                <td class="px-4 py-3">
+                <td class="px-4 py-3" data-label="${t('tableNotes')}">
                     <div class="notes-container" id="notes-${item.id}">
                         <div class="notes-display" id="notes-display-${item.id}">
                             <span class="notes-text">${item.notes || '無備註'}</span>
@@ -557,7 +557,7 @@ function renderTable() {
                         </div>
                     </div>
                 </td>
-                ${canEdit ? `<td class="px-4 py-3">
+                ${canEdit ? `<td class="px-4 py-3" data-label="${t('tableActions')}">
                     <div class="actions">
                         ${editButtonHTML}
                         ${deleteButtonHTML}
