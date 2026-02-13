@@ -90,21 +90,27 @@ async function loadDataFromAPI(retryCount = 0) {
 }
 
 async function saveEdit(event) {
-    event.preventDefault();
+    console.log('🚨 saveEdit 被觸發！event:', event);
 
-    // 防止重複提交
+    event.preventDefault();
+    console.log('✅ 已調用 preventDefault()');
+
+    // 防止重複提交 - 使用更強的檢查
     if (isSaving) {
-        console.log('⚠️ 正在儲存，請勿重複提交');
+        console.log('⚠️ ⚠️ ⚠️ 正在儲存，請勿重複提交！isSaving 已為 true');
         return;
     }
 
     isSaving = true;
+    console.log('🔐 已設置 isSaving = true');
+
     showLoading(true);
 
     // 禁用提交按鈕
     const submitBtn = event.target?.querySelector('button[type="submit"]');
     if (submitBtn) {
         submitBtn.disabled = true;
+        submitBtn.textContent = '儲存中...';
         console.log('🔒 提交按鈕已禁用');
     }
 
@@ -164,13 +170,18 @@ async function saveEdit(event) {
         showNotification('❌ 錯誤: ' + error.message);
     } finally {
         isSaving = false;
+        console.log('🔓 已設置 isSaving = false');
+
         showLoading(false);
 
         // 恢復提交按鈕
         const submitBtn = document.querySelector('#editForm button[type="submit"]');
         if (submitBtn) {
             submitBtn.disabled = false;
-            console.log('🔓 提交按鈕已恢復');
+            submitBtn.textContent = '儲存';
+            console.log('🔓 提交按鈕已恢復，可以再次提交');
+        } else {
+            console.warn('⚠️ 找不到提交按鈕！');
         }
 
         console.log(`📝 [${requestId}] saveEdit 執行完成`);
