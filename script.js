@@ -611,6 +611,7 @@ function toggleAddForm() {
     currentEditId = null;
     document.getElementById('editForm').reset();
     document.getElementById('editDate').value = new Date().toISOString().split('T')[0];
+    document.getElementById('editSequence').value = '1';
     new bootstrap.Modal(document.getElementById('editModal')).show();
 }
 
