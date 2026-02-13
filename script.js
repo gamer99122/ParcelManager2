@@ -414,17 +414,12 @@ function formatDate(dateString) {
 
 async function loadDataFromAPI(retryCount = 0, isInitialLoad = false) {
     try {
-        showToast(t('loadingData'), 2000);
-        console.log(`📖 正在從 API 讀取資料... (嘗試 ${retryCount + 1}/${isInitialLoad ? 4 : 2})`);
+        if (retryCount === 0) {
+            showToast(t('loadingData'), 2000);
+        }
+        console.log('📖 正在從 API 讀取資料...');
 
-        // 為手機網路設定較長的超時時間
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10秒超時
-
-        const response = await fetch(`${API_BASE_URL}/api/items`, {
-            signal: controller.signal
-        });
-        clearTimeout(timeoutId);
+        const response = await fetch(`${API_BASE_URL}/api/items`);
 
         const result = await response.json();
 
@@ -442,12 +437,7 @@ async function loadDataFromAPI(retryCount = 0, isInitialLoad = false) {
         }
     } catch (error) {
         console.error('❌ 讀取錯誤:', error);
-
-        // 判斷是否為網路超時
-        const isTimeout = error.name === 'AbortError';
-        const errorMsg = isTimeout ? '網路連線逾時' : error.message;
-
-        showNotification(t('notifyLoadError') + ': ' + errorMsg);
+        showNotification(t('notifyLoadError') + ': ' + error.message);
 
         // 初次載入時重試3次，手動重新整理時重試1次
         const maxRetries = isInitialLoad ? 3 : 1;
@@ -455,7 +445,7 @@ async function loadDataFromAPI(retryCount = 0, isInitialLoad = false) {
         if (retryCount < maxRetries) {
             // 使用指數退避：3秒、6秒、9秒
             const delay = (retryCount + 1) * 3000;
-            console.log(`⏳ ${delay / 1000} 秒後自動重試...`);
+            console.log('⏳ 自動重試中...');
             setTimeout(() => loadDataFromAPI(retryCount + 1, isInitialLoad), delay);
         } else if (isInitialLoad) {
             // 所有重試都失敗後，顯示提示訊息
