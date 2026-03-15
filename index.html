@@ -68,6 +68,7 @@
                                 <th class="col-image px-4 py-3">圖片</th>
                                 <th class="col-brand px-4 py-3">商家</th>
                                 <th class="col-shipment px-4 py-3">寄送狀態</th>
+                                <th class="col-shipdate px-4 py-3">寄送時間</th>
                                 <th class="col-notes px-4 py-3">備註</th>
                                 <th class="col-actions px-4 py-3" id="actionsHeader">操作</th>
                             </tr>
@@ -151,6 +152,10 @@
                                     <option value="寄送">寄送</option>
                                     <option value="部分寄送">部分寄送</option>
                                 </select>
+                            </div>
+                            <div class="mb-3" id="shipDateGroup" style="display: none;">
+                                <label for="editShipDate" class="form-label fw-bold">寄送時間</label>
+                                <input type="date" class="form-control" id="editShipDate">
                             </div>
                             <div class="d-flex gap-2 justify-content-end">
                                 <button type="button" class="btn btn-secondary" id="btnCancel"

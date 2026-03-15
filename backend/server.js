@@ -87,11 +87,13 @@ app.post('/api/items', async (req, res) => {
             brand: req.body.brand,
             notes: req.body.notes,
             shipment: req.body.shipment || '空白',
+            shipDate: req.body.shipDate || null,
+            locked: req.body.locked === true || req.body.locked === 'true' || req.body.locked === 1,
             createdAt: new Date(),
             updatedAt: new Date()
         };
 
-        console.log(`📝 [${requestId}] 準備插入 MongoDB...`);
+        console.log(`📝 [${requestId}] 準備插入 MongoDB:`, item);
         const result = await itemsCollection.insertOne(item);
         console.log(`📝 [${requestId}] ✅ 插入成功，ID: ${result.insertedId}`);
 
@@ -115,15 +117,36 @@ app.put('/api/items/:id', async (req, res) => {
         const { ObjectId } = require('mongodb');
         const itemId = new ObjectId(req.params.id);
 
+        const currentItem = await itemsCollection.findOne({ _id: itemId });
+        if (!currentItem) {
+            return res.status(404).json({ success: false, message: '項目不存在' });
+        }
+
+        // 寬鬆判定鎖定狀態：支援布林、字串、數字
+        let newLocked = currentItem.locked || false;
+        if (req.body.locked !== undefined) {
+            newLocked = req.body.locked === true || req.body.locked === 'true' || req.body.locked === 1 || req.body.locked === '1';
+        }
+
+        console.log(`🔄 更新項目 ${req.params.id}:`, {
+            before: currentItem.locked,
+            received: req.body.locked,
+            after: newLocked
+        });
+
         const updatedItem = {
-            date: req.body.date,
-            sequence: req.body.sequence,
-            images: req.body.images || ['', '', '', '', '', ''],
-            brand: req.body.brand,
-            notes: req.body.notes,
-            shipment: req.body.shipment || '空白',
+            date: req.body.date || currentItem.date,
+            sequence: req.body.sequence || currentItem.sequence,
+            images: req.body.images || currentItem.images || ['', '', '', '', '', ''],
+            brand: req.body.brand !== undefined ? req.body.brand : currentItem.brand,
+            notes: req.body.notes !== undefined ? req.body.notes : currentItem.notes,
+            shipment: req.body.shipment || currentItem.shipment || '空白',
+            shipDate: req.body.shipDate !== undefined ? req.body.shipDate : currentItem.shipDate,
+            locked: newLocked,
             updatedAt: new Date()
         };
+
+        console.log('📝 要保存的 updatedItem:', JSON.stringify(updatedItem, null, 2));
 
         const result = await itemsCollection.findOneAndUpdate(
             { _id: itemId },
@@ -131,24 +154,20 @@ app.put('/api/items/:id', async (req, res) => {
             { returnDocument: 'after' }
         );
 
-        if (!result.value) {
-            return res.status(404).json({
-                success: false,
-                message: '項目不存在'
-            });
-        }
+        console.log('✅ MongoDB 更新結果:', result.value ? 'OK' : 'FAILED');
+        console.log('📋 返回的文檔 locked 值:', result.value?.locked);
+
+        // 相容不同版本的 MongoDB Driver
+        const finalDoc = result.value || result;
 
         res.json({
             success: true,
-            data: result.value,
+            data: finalDoc,
             message: '更新成功'
         });
     } catch (error) {
         console.error('更新錯誤:', error);
-        res.status(500).json({
-            success: false,
-            message: '更新失敗: ' + error.message
-        });
+        res.status(500).json({ success: false, message: '更新失敗: ' + error.message });
     }
 });
 
@@ -180,7 +199,29 @@ app.delete('/api/items/:id', async (req, res) => {
     }
 });
 
-// 健康檢查
+// 健康檢查 - 包含 MongoDB 連接狀態
+app.get('/api/health', async (req, res) => {
+    try {
+        // 嘗試查詢 MongoDB
+        const adminDb = db?.admin();
+        const status = await adminDb?.ping();
+
+        res.json({
+            status: 'OK',
+            mongodb: 'CONNECTED',
+            timestamp: new Date()
+        });
+    } catch (error) {
+        res.status(503).json({
+            status: 'ERROR',
+            mongodb: 'DISCONNECTED',
+            error: error.message,
+            timestamp: new Date()
+        });
+    }
+});
+
+// 舊的健康檢查端點（相容性）
 app.get('/health', (req, res) => {
     res.json({ status: 'OK', timestamp: new Date() });
 });
