@@ -1,13 +1,6 @@
 // ===== 多語系功能 =====
 const translations = {
     'zh-TW': {
-        // 登入頁面
-        loginTitle: '包裹管理系統',
-        loginSubtitle: '請輸入驗證碼以繼續',
-        loginPlaceholder: '請輸入驗證碼',
-        loginButton: '登入',
-        loginError: '❌ 驗證碼錯誤，請重試',
-
         // 主頁面標題
         pageTitle: '📦 包裹清單管理',
         pageSubtitle: '追蹤和管理您的包裹',
@@ -67,13 +60,6 @@ const translations = {
         imagePlaceholder: '圖片'
     },
     'ja': {
-        // ログインページ
-        loginTitle: '荷物管理システム',
-        loginSubtitle: '認証コードを入力してください',
-        loginPlaceholder: '認証コードを入力',
-        loginButton: 'ログイン',
-        loginError: '❌ 認証コードが間違っています',
-
         // メインページタイトル
         pageTitle: '📦 荷物リスト管理',
         pageSubtitle: '荷物を追跡・管理',
@@ -304,70 +290,6 @@ function updateLanguageButtons() {
     });
 }
 
-// ===== 驗證碼登入功能 =====
-const CORRECT_CODE = '20260225'; // 預設驗證碼
-const AUTH_KEY = 'parcelManagerAuth';
-
-// 檢查是否已登入
-function checkAuth() {
-    const isAuthenticated = sessionStorage.getItem(AUTH_KEY);
-    if (isAuthenticated === 'true') {
-        showMainContent();
-    } else {
-        showLoginPage();
-    }
-}
-
-// 顯示登入頁面
-function showLoginPage() {
-    document.getElementById('loginPage').style.display = 'flex';
-    document.getElementById('mainContent').style.display = 'none';
-    document.getElementById('loginCode').focus();
-}
-
-// 顯示主要內容
-function showMainContent() {
-    document.getElementById('loginPage').style.display = 'none';
-    document.getElementById('mainContent').style.display = 'block';
-    // 更新頁面語言
-    updatePageLanguage();
-    // 載入資料（標記為初次載入，啟用更強的重試機制）
-    loadDataFromAPI(0, true);
-}
-
-// 處理登入
-function handleLogin(event) {
-    event.preventDefault();
-    const code = document.getElementById('loginCode').value;
-    const errorDiv = document.getElementById('loginError');
-
-    if (code === CORRECT_CODE) {
-        // 驗證成功
-        sessionStorage.setItem(AUTH_KEY, 'true');
-        errorDiv.textContent = '';
-
-        // 顯示成功動畫
-        const loginBox = document.querySelector('.login-box');
-        loginBox.style.animation = 'slideOut 0.3s ease';
-
-        setTimeout(() => {
-            showMainContent();
-            loadDataFromAPI(0, true); // 載入資料（初次載入）
-        }, 300);
-    } else {
-        // 驗證失敗
-        errorDiv.textContent = t('loginError');
-        document.getElementById('loginCode').value = '';
-        document.getElementById('loginCode').focus();
-
-        // 震動效果
-        const loginBox = document.querySelector('.login-box');
-        loginBox.style.animation = 'shake 0.5s ease';
-        setTimeout(() => {
-            loginBox.style.animation = 'slideIn 0.5s ease';
-        }, 500);
-    }
-}
 
 // ===== API 配置 =====
 // Railway 後端 URL
@@ -913,9 +835,6 @@ window.updateShipmentColor = updateShipmentColor;
 // ===== 初始化 =====
 
 document.addEventListener('DOMContentLoaded', () => {
-    // 先檢查驗證狀態
-    checkAuth();
-
     // 檢查 URL 參數 edit=1
     const params = new URLSearchParams(window.location.search);
     const addBtn = document.getElementById('addBtn');
@@ -935,5 +854,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 初始化觸控滑動事件
     initLightboxTouchEvents();
-    // loadDataFromAPI(); // 移除這裡的調用,改在登入成功後調用
+
+    // 直接載入資料
+    updatePageLanguage();
+    loadDataFromAPI(0, true);
 });

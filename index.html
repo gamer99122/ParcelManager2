@@ -10,30 +10,8 @@
 </head>
 
 <body class="bg-light">
-    <!-- 驗證碼登入頁面 -->
-    <div id="loginPage" class="login-page">
-        <div class="login-container">
-            <div class="login-box">
-                <div class="login-icon">🔐</div>
-                <h2 class="login-title">包裹管理系統</h2>
-                <p class="login-subtitle">請輸入驗證碼以繼續</p>
-                <form id="loginForm" onsubmit="handleLogin(event)">
-                    <input type="password" id="loginCode" class="login-input" placeholder="請輸入驗證碼" autocomplete="off"
-                        required>
-                    <button type="submit" class="login-button">登入</button>
-                    <div id="loginError" class="login-error"></div>
-                </form>
-                <!-- 語言選擇器 -->
-                <div class="language-selector">
-                    <button class="lang-btn active" data-lang="zh-TW" onclick="switchLanguage('zh-TW')">繁中</button>
-                    <button class="lang-btn" data-lang="ja" onclick="switchLanguage('ja')">日本語</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- 主要內容區域 -->
-    <div id="mainContent" style="display: none;">
+    <div id="mainContent">
         <div class="container-fluid py-5">
             <div class="container">
                 <!-- 頁面標題 -->
